@@ -10,7 +10,7 @@ Concepts covered: Classes, assertion
 
 
 class ComboLock:
-    MAX = 100
+    MAX = 60
     
     def __init__(self, key1, key2, key3):
         self.key1 = key1
@@ -18,41 +18,50 @@ class ComboLock:
         self.key3 = key3
         
         self.dial = 0
-        self.attempt = []  # the current 3-number combo being entered into the lock
+        self.index = 0
+        self.attempt = [0, 0, 0]  # the current 3-number combo being entered into the lock
         self.lefts = 0
+        self.prevRight = False
 
     # Sets the dial at zero
     def reset(self):
         self.dial = 0
-        self.attempt = []
+        self.index = 0
+        self.attempt = [0, 0, 0]  # Initialize with 3 elements
+        self.prevRight = False
 
     # Turns the dial a number of ticks counter-clockwise and updates attempt
-    def turn_left(self, ticks):
-        # Add previous value.
-        self.attempt.append(dial)
-        
+    def turn_right(self, ticks):
         self.dial += ticks
         # Roll over if over max value
-        if self.dial > MAX:
+        while self.dial >= self.MAX:
             self.dial = self.dial - self.MAX
+            
+        self.attempt[self.index] = self.dial
+        if not self.prevRight:
+            self.index += 1
+        self.prevRight = True
 
     # Turns the dial a number of ticks clockwise and updates attempt list
-    def turn_right(self, ticks):
-        # Add previous value if attempts are not empty
-        if self.attempts != []:
-            self.attempts.append(self.dial)
-            
+    def turn_left(self, ticks):
         self.dial -= ticks 
-        if self.dial < 0:
+        while self.dial < 0:
         # Roll over if less than zero
             self.dial = self.MAX + self.dial
-
-    def _checkFull():
-        if len(self.
+        
+        if self.index >= 3:
+            del self.attempt[0]
+            self.attempt.append(self.dial)
+        else:
+            self.attempt[self.index] = self.dial
+        if self.prevRight:
+            self.index += 1
+        self.prevRight = False
 
     # Returns true if the lock is open (attempt == keys), false otherwise
     def isopen(self):
-        # Code here
+        if self.attempt == [self.key1, self.key2, self.key3]:
+            return True
 
     # String representation of the ComboLock class
     def __repr__(self):
@@ -116,7 +125,7 @@ def test2():
     lock.reset()
     lock.turn_left(20)
     lock.turn_left(10)
-    lock.turn_left(25)    
+    lock.turn_left(25)
     assert not lock.isopen()
     
  
