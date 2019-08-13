@@ -46,8 +46,9 @@ def main():
         for i in range(len(correct_letters)):
             if guess == correct_letters[i][0]:
                 correct_letters[i][1] = guess
+                if not guessed_correctly:
+                    print("Correct")
                 guessed_correctly = True
-                print("Correct")
 
         # Guess was wrong
         if not guessed_correctly:

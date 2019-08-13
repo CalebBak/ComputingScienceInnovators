@@ -15,15 +15,16 @@ __author__      = "Tem Tamre"
 __copyright__   = "ttamre@ualberta.ca"
 
 
-class BankAccount:
+class BankAccount:    
     def __init__(self, name, balance=5000):
-        # Code here
+        self.name = name
+        self.balance = balance
     
     def deposit(self, amount):
-        # Code here
+        self.balance += amount
 
     def withdraw(self, amount):
-        # Code here
+        self.balance -= amount
     
     def showAccount(self):
         print("Name:", self.name)
@@ -40,7 +41,7 @@ def test():
     alex.deposit(500)
     alex.deposit(1500)
     alex.withdraw(250.25)
-    assert alex.balance == 6750.75
+    assert alex.balance == 6749.75
     alex.showAccount()
 
     # Testing Bobby
@@ -49,7 +50,7 @@ def test():
     bobby.deposit(alex.balance)
     bobby.withdraw(500)
     bobby.withdraw(1250.50)
-    assert bobby.balance == 4749.5
+    assert bobby.balance == 8249.25
     bobby.showAccount()
 
 

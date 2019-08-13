@@ -12,20 +12,22 @@ Extensions:     Add employee.company, format showEmployees better
 
 class Company:
     def __init__(self, name):
-        # Code here
+        self.name = name
+        self.EmployeeList = []
     
     def hire(self, employee):
-        # Code here
+        self.EmployeeList.append(employee)
         
     def fire(self, employee):
-        # Code here
+        self.EmployeeList.remove(employee)
     
     def showEmployees(self):
-        # Code here
+        for employee in self.EmployeeList:
+            print(employee.name)
         
 class Employee:
     def __init__(self, name):
-        # Code here
+        self.name = name
         
 
 def test():
