@@ -11,7 +11,7 @@ Concepts covered: Random, printing
 import random
 
 def main():
-    # Code here
+    print(random.randint(1, 6))
 
 if __name__ == "__main__":
     main()
