@@ -11,7 +11,14 @@ Concepts covered: Random, printing
 import random
 
 def main():
-    print(random.randint(1, 6))
+    while True:
+        size = input("Select the dice size: ")
+        
+        print(random.randint(1, 6))
+        
+        again = input("Would you like to roll again? [y/N]").lower()
+        if again != "y":
+            break
 
 if __name__ == "__main__":
     main()
