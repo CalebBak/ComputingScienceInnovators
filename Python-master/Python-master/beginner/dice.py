@@ -12,9 +12,16 @@ import random
 
 def main():
     while True:
-        size = input("Select the dice size: ")
+        try:
+            size = int(input("Select the dice size: "))
+            num = int(input("Select the number of dice: "))
+        except ValueError:
+            print("Not a valid value")
+            continue
         
-        print(random.randint(1, 6))
+        print("Rolling %dd%d" % (num, size))
+        for i in range(num):
+            print(random.randint(1, size))
         
         again = input("Would you like to roll again? [y/N]").lower()
         if again != "y":
