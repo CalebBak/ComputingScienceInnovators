@@ -10,8 +10,8 @@ import time
 
 def collision(snake_head, snake_position):
     # if snake is outside of boundaries return 1
-    if snake_head[0] <= 0 or snake_head[0] >= display.get_width()\
-       or snake_head[1] <= 0 or snake_head[1] >= display.get_height()\
+    if snake_head[0] < 0 or snake_head[0] >= display.get_width()\
+       or snake_head[1] < 0 or snake_head[1] >= display.get_height()\
        or snake_head in snake_position[1:]:
         return True
     return False
@@ -70,7 +70,7 @@ def play_game(snake_head, snake_position, button_direction):
                     button_direction = 2
                 elif event.key == pygame.K_UP:
                     button_direction = 3                
-                
+
         if first_run:
             button_direction = 3
             first_run = False
