@@ -20,14 +20,22 @@ class Company:
         
     def fire(self, employee):
         self.EmployeeList.remove(employee)
+        employee.fire()
     
     def showEmployees(self):
         for employee in self.EmployeeList:
             print(employee.name)
         
 class Employee:
-    def __init__(self, name):
+    def __init__(self, name, job=None):
         self.name = name
+        self.job = [job]
+        
+    #def fire(self, company):
+        #self.company.remove(company)
+        
+    #def hire(self, company):
+        #self.company.append(
         
 
 def test():
