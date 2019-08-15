@@ -17,26 +17,30 @@ class Company:
     
     def hire(self, employee):
         self.EmployeeList.append(employee)
+        employee.hire(self.name)
         
     def fire(self, employee):
         self.EmployeeList.remove(employee)
-        employee.fire()
+        employee.fire(self.name)
     
     def showEmployees(self):
         for employee in self.EmployeeList:
             print(employee.name)
-        
+
 class Employee:
     def __init__(self, name, job=None):
         self.name = name
-        self.job = [job]
+        self.jobs = [job]
         
-    #def fire(self, company):
-        #self.company.remove(company)
-        
-    #def hire(self, company):
-        #self.company.append(
-        
+    def fire(self, company):
+        self.jobs.remove(company)
+
+    def hire(self, company):
+        self.jobs.append(company)
+
+    def showJobs(self):
+        for job in self.jobs:
+            print(job)
 
 def test():
     #Initilize objects
@@ -57,7 +61,9 @@ def test():
     Google.fire(Johhny)
     Google.showEmployees()
     assert Google.EmployeeList[0]==Olivia
+    Olivia.showJobs()
     Google.fire(Olivia)
+    Olivia.showJobs()
     Google.showEmployees()
     assert len(Google.EmployeeList) == 0
     

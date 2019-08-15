@@ -69,7 +69,7 @@ def play_game(snake_head, snake_position, button_direction):
                 elif event.key == pygame.K_DOWN:
                     button_direction = 2
                 elif event.key == pygame.K_UP:
-                    button_direction = 3                
+                    button_direction = 3
 
         if first_run:
             button_direction = 3
