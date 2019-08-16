@@ -104,7 +104,7 @@ class Game:
     def play(self):
         snake1 = Snake(self.window, (255, 0, 0), self.MAX_BLOCK_WIDTH, 30, 0)
         snake2 = Snake(self.window, (0, 0, 255), self.MAX_BLOCK_WIDTH, -30, 0)
-        foods = [Food(self.window, (self.window.get_width(), self.window.get_height()), self.MAX_BLOCK_WIDTH, [snake1, snake2])]
+        foods = [Food(self.window, (self.window.get_width(), self.window.get_height()), self.MAX_BLOCK_WIDTH, [snake1, snake2], self.bg_colour)]
         bomb = None
 
         p_crashed = [False, False]
@@ -157,10 +157,10 @@ class Game:
 
             # Generate new food on chance
             if random.randint(1, 50) == 1:
-                foods.append(Food(self.window, (self.window.get_width(), self.window.get_height()),  self.MAX_BLOCK_WIDTH, [snake1, snake2]))
+                foods.append(Food(self.window, (self.window.get_width(), self.window.get_height()),  self.MAX_BLOCK_WIDTH, [snake1, snake2], self.bg_colour))
 
             # Generate a bomb on chance
-            if bomb is None and random.randint(1, 20) == 1:
+            if bomb is None and random.randint(1, 150) == 1:
                 bomb = Bomb(self.window, (self.window.get_width(), self.window.get_height()), self.MAX_BLOCK_WIDTH)
 
             # draw
@@ -181,12 +181,12 @@ class Game:
                     snake1.add_segment()
                     snake1.score += food.value
                     foods.remove(food)
-                    foods.append(Food(self.window, (self.window.get_width(), self.window.get_height()),  self.MAX_BLOCK_WIDTH, [snake1, snake2]))
+                    foods.append(Food(self.window, (self.window.get_width(), self.window.get_height()),  self.MAX_BLOCK_WIDTH, [snake1, snake2], self.bg_colour))
                 elif food.collected(snake2):
                     snake2.add_segment()
                     snake2.score += food.value
                     foods.remove(food)
-                    foods.append(Food(self.window, (self.window.get_width(), self.window.get_height()), self.MAX_BLOCK_WIDTH, [snake1, snake2]))
+                    foods.append(Food(self.window, (self.window.get_width(), self.window.get_height()), self.MAX_BLOCK_WIDTH, [snake1, snake2], self.bg_colour))
 
             # Check if crashed
             p_crashed[0] = snake1.check_collision([self.window.get_width(), self.window.get_height()], [snake2])
@@ -214,12 +214,13 @@ class Game:
 class Food:
     FOOD_COLOUR = (0, 212, 0)
     
-    def __init__(self, display, dimens, block_width, snakes):
+    def __init__(self, display, dimens, block_width, snakes, bg_colour):
         """
         Generates a random food
         """
 
         self.BLOCK_WIDTH = block_width
+        self.BG_COLOUR = bg_colour
 
         self.value = random.randint(3, self.BLOCK_WIDTH)
         self.display = display
@@ -239,9 +240,14 @@ class Food:
         """
         Draws the food
         """
-        pygame.draw.rect(self.display, self.FOOD_COLOUR,
-                         pygame.Rect(self.x, self.y, self.value,
-                                     self.value))
+        container = pygame.Rect(self.x, self.y, self.BLOCK_WIDTH, self.BLOCK_WIDTH)
+        food = pygame.Rect(self.x, self.y, self.value, self.value)
+        
+        # Center food in a cell
+        food.center = container.center
+        
+        pygame.draw.rect(self.display, self.BG_COLOUR, container)        
+        pygame.draw.rect(self.display, self.FOOD_COLOUR, food)
 
     def collected(self, snake):
         snake_head = snake.position[0]
