@@ -13,7 +13,6 @@ class Directions(enum.Enum):
     DOWN = 2
     UP = 3
 
-import time
 class Snake:
     def __init__(self, display, colour, block_width, offset_x, offset_y):
         """
@@ -85,7 +84,11 @@ class Game:
     DEFAULT_DIMENSIONS = (500, 500)
     MAX_BLOCK_WIDTH = 10
     SCORE_BANNER_HEIGHT = MAX_BLOCK_WIDTH*2
-    
+
+    # 1 in n
+    FOOD_GEN_CHANCE = 75
+    BOMB_GEN_CHANCE = 150
+
     def __init__(self, bg_colour, difficulty):
         """
         Creates and configures the game window
@@ -156,7 +159,7 @@ class Game:
                 snake2.move(dir2)
 
             # Generate new food on chance
-            if random.randint(1, 50) == 1:
+            if random.randint(1, 75) == 1:
                 foods.append(Food(self.window, (self.window.get_width(), self.window.get_height()),  self.MAX_BLOCK_WIDTH, [snake1, snake2], self.bg_colour))
 
             # Generate a bomb on chance
@@ -195,25 +198,55 @@ class Game:
             crashed = p_crashed[0] and p_crashed[1]
 
             self.clock.tick(self.clock_tick_speed)
+            
+        # draw game over text
+        game_over_text = self.font.render("Game Over", True, (0, 0, 0))
+        exit_text = self.font.render("Press any key to exit", True, (0, 0, 0))
+        window_rect = self.window.get_rect()
+
+        game_over_rect = game_over_text.get_rect()
+        exit_rect = exit_text.get_rect()
+        
+        game_over_rect.centerx = window_rect.centerx
+        game_over_rect.centery = window_rect.centery - 10
+        
+        exit_rect.centerx = window_rect.centerx
+        exit_rect.centery = window_rect.centery + 10
+
+        self.window.blit(game_over_text, game_over_rect)
+        pygame.display.update()
+        
+        pygame.time.wait(500)
+
+        self.window.blit(exit_text, exit_rect)
+        pygame.display.update()
+        
+        pygame.event.clear()
+        key = None
+        while True:
+            event = pygame.event.wait()
+            if event.type == pygame.KEYDOWN:
+                break
+
 
     def draw_score(self, score1, score2):
         # Draw score banner
         banner = pygame.Rect(0, 0, self.window.get_height(), self.SCORE_BANNER_HEIGHT)
         pygame.draw.rect(self.window, (0, 0, 0), banner)
-        
+
         # Draw text
-        score1_text = self.font.render("P1: %d" % score1, 1, (255, 255, 255))
-        score2_text = self.font.render("P2: %d" % score2, 1, (255, 255, 255))
-        
+        score1_text = self.font.render("P1: %d" % score1, True, (255, 255, 255))
+        score2_text = self.font.render("P2: %d" % score2, True, (255, 255, 255))
+
         score2_rect = score2_text.get_rect()
         score2_rect.right = banner.right
-        
+
         self.window.blit(score1_text, (0, 1))
         self.window.blit(score2_text, score2_rect)
 
 class Food:
     FOOD_COLOUR = (0, 212, 0)
-    
+
     def __init__(self, display, dimens, block_width, snakes, bg_colour):
         """
         Generates a random food
@@ -242,10 +275,10 @@ class Food:
         """
         container = pygame.Rect(self.x, self.y, self.BLOCK_WIDTH, self.BLOCK_WIDTH)
         food = pygame.Rect(self.x, self.y, self.value, self.value)
-        
+
         # Center food in a cell
         food.center = container.center
-        
+
         pygame.draw.rect(self.display, self.BG_COLOUR, container)        
         pygame.draw.rect(self.display, self.FOOD_COLOUR, food)
 
@@ -261,7 +294,7 @@ class Bomb:
     BOMB_COLOUR_PRIMED = (255, 86, 23)
     EXPLOSION_COLOUR = (204, 55, 0)
     fuse = 50
-    
+
     def __init__(self, display, dimens, block_width):
         """
         Generates a bomb
@@ -270,7 +303,7 @@ class Bomb:
         self.display = display
         self.x = math.ceil(random.randint(0, dimens[0]-self.BLOCK_WIDTH) / self.BLOCK_WIDTH) * self.BLOCK_WIDTH
         self.y = math.ceil(random.randint(self.BLOCK_WIDTH, dimens[1]-self.BLOCK_WIDTH) / self.BLOCK_WIDTH) * self.BLOCK_WIDTH
-        
+
     def draw(self, snakes):
         """
         Draws the food
@@ -281,7 +314,7 @@ class Bomb:
             return True
         elif self.fuse % 2 == 0:
             colour = self.BOMB_COLOUR_PRIMED
-        
+
         pygame.draw.rect(self.display, colour, pygame.Rect(self.x, self.y, self.BLOCK_WIDTH, self.BLOCK_WIDTH))
         self.fuse -= 1
         return False
@@ -296,17 +329,15 @@ class Bomb:
         # Explosion
         area = pygame.draw.rect(self.display, self.EXPLOSION_COLOUR, pygame.Rect(explosion_x, explosion_y, self.BLOCK_WIDTH*3, self.BLOCK_WIDTH*3))
         center = pygame.draw.rect(self.display, self.BOMB_COLOUR_PRIMED, pygame.Rect(self.x, self.y, self.BLOCK_WIDTH, self.BLOCK_WIDTH))
-        
+
         pygame.display.update(area)
         pygame.display.update(center)
-        #pygame.time.delay(100)
-        
-        
+
         # Check if snake got caught in the explosion
         explode_area = list()
-        for i in range(1, 4):
-            for j in range(1, 4):
-                explode_area.append([self.x + (self.BLOCK_WIDTH*i), self.y + (self.BLOCK_WIDTH*j)])
+        for i in range(3):
+            for j in range(3):
+                explode_area.append([(self.x - self.BLOCK_WIDTH) + (self.BLOCK_WIDTH*i), (self.y - self.BLOCK_WIDTH) + (self.BLOCK_WIDTH*j)])
         for snake in snakes:
             for position in snake.position:
                 if position in explode_area:
@@ -318,8 +349,8 @@ if __name__ == "__main__":
     diff = input("Select your difficulty ([e]asy, [N]ormal, [h]ard): ").lower()
     if diff not in ["e", "n", "h"]:
         diff = "n"
-    
-    pygame.init()    
+
+    pygame.init()
     
     game = Game((200,200,200), diff)
     game.play()
